@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}DigiLocker - Secure Document Management{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Parallax -->
+<div class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Parallax Background -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600/90 to-purple-700/90"></div>
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&q=80')] bg-cover bg-center"></div>
+    </div>
+    
+    <!-- Content -->
+    <div class="relative z-10 text-white text-center px-4 sm:px-6 lg:px-8 animate-fade-in">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+            Your Digital Document Vault
+        </h1>
+        <p class="text-xl sm:text-2xl mb-8 max-w-3xl mx-auto">
+            Securely store, manage, and access your important documents anytime, anywhere.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('register') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors">
+                Get Started
+                <svg class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+            </a>
+            <a href="{{ url_for('login') }}" class="inline-flex items-center px-6 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-blue-600 transition-colors">
+                Sign In
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="py-20 bg-white dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold mb-4">Why Choose DigiLocker?</h2>
+            <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                Experience the future of document management with our state-of-the-art features.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Secure Storage -->
+            <div class="p-6 rounded-lg glassmorphism transform hover:scale-105 transition-all duration-300">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Secure Storage</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Your documents are encrypted and stored with bank-level security.
+                </p>
+            </div>
+            
+            <!-- Easy Access -->
+            <div class="p-6 rounded-lg glassmorphism transform hover:scale-105 transition-all duration-300">
+                <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Easy Access</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Access your documents anytime, anywhere, from any device.
+                </p>
+            </div>
+            
+            <!-- Smart Organization -->
+            <div class="p-6 rounded-lg glassmorphism transform hover:scale-105 transition-all duration-300">
+                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Smart Organization</h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Organize documents with tags, categories, and smart search.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-20 bg-gradient-to-br from-blue-600 to-purple-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+            Join thousands of users who trust DigiLocker for their document management needs.
+        </p>
+        <a href="{{ url_for('register') }}" class="inline-flex items-center px-8 py-4 border-2 border-white text-lg font-medium rounded-md text-white hover:bg-white hover:text-blue-600 transition-colors">
+            Create Your Account
+            <svg class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Parallax effect
+    window.addEventListener('scroll', () => {
+        const parallax = document.querySelector('.bg-[url]');
+        let scrollPosition = window.pageYOffset;
+        parallax.style.transform = 'translateY(' + scrollPosition * 0.5 + 'px)';
+    });
+</script>
+{% endblock %}

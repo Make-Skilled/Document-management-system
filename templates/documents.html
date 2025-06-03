@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}My Documents - DigiLocker{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Documents</h1>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Manage and organize your documents
+                </p>
+            </div>
+            <a href="{{ url_for('upload') }}"
+                class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium
+                       text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2
+                       focus:ring-primary transition-colors">
+                <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Upload New
+            </a>
+        </div>
+
+        <!-- Filters and View Toggle -->
+        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-4">
+                <!-- Category Filter -->
+                <select id="categoryFilter" class="form-select rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                    <option value="">All Categories</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Official">Official</option>
+                    <option value="Education">Education</option>
+                    <option value="Financial">Financial</option>
+                    <option value="Medical">Medical</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <!-- Sort By -->
+                <select id="sortBy" class="form-select rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+                    <option value="date_desc">Newest First</option>
+                    <option value="date_asc">Oldest First</option>
+                    <option value="name_asc">Name A-Z</option>
+                    <option value="name_desc">Name Z-A</option>
+                    <option value="size_desc">Size: Large to Small</option>
+                    <option value="size_asc">Size: Small to Large</option>
+                </select>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="flex items-center space-x-2">
+                <button id="gridView" class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                    </svg>
+                </button>
+                <button id="listView" class="p-2 text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primary">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Documents Grid View -->
+        <div id="documentsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for doc in documents %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow glassmorphism">
+                <!-- Document Preview -->
+                <div class="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-700">
+                    {% if doc.file_type == 'pdf' %}
+                        <svg class="h-16 w-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                    {% elif doc.file_type in ['doc', 'docx'] %}
+                        <svg class="h-16 w-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    {% else %}
+                        <img src="{{ url_for('static', filename='uploads/' + doc.filename) }}" 
+                             alt="{{ doc.original_filename }}"
+                             class="h-32 object-cover">
+                    {% endif %}
+                </div>
+
+                <!-- Document Info -->
+                <div class="p-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white truncate" title="{{ doc.original_filename }}">
+                        {{ doc.original_filename }}
+                    </h3>
+                    <div class="mt-2 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                        <span>{{ doc.category }}</span>
+                        <span class="mx-2">•</span>
+                        <span>{{ (doc.file_size / 1024)|round|int }} KB</span>
+                    </div>
+                    {% if doc.tags %}
+                    <div class="mt-2 flex flex-wrap gap-1">
+                        {% for tag in doc.tags %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            {{ tag }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ doc.upload_date.strftime('%B %d, %Y') }}
+                    </span>
+                    <div class="flex space-x-2">
+                        <a href="{{ url_for('view_document', doc_id=doc._id) }}"
+                            class="inline-flex items-center p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                            title="View">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </a>
+                        <a href="{{ url_for('download_document', doc_id=doc._id) }}"
+                            class="inline-flex items-center p-1.5 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+                            title="Download">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                        </a>
+                        <button onclick="deleteDocument('{{ doc._id }}')"
+                            class="inline-flex items-center p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-lg transition-colors"
+                            title="Delete">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Documents List View (Hidden by default) -->
+        <div id="documentsList" class="hidden space-y-4">
+            {% for doc in documents %}
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow p-4 glassmorphism">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <!-- Document Icon -->
+                        <div class="flex-shrink-0">
+                            {% if doc.file_type == 'pdf' %}
+                                <svg class="h-10 w-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                            {% elif doc.file_type in ['doc', 'docx'] %}
+                                <svg class="h-10 w-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            {% else %}
+                                <img src="{{ url_for('static', filename='uploads/' + doc.filename) }}"
+                                     alt="{{ doc.original_filename }}"
+                                     class="h-10 w-10 object-cover rounded">
+                            {% endif %}
+                        </div>
+
+                        <!-- Document Info -->
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                                {{ doc.original_filename }}
+                            </h3>
+                            <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                                <span>{{ doc.category }}</span>
+                                <span class="mx-2">•</span>
+                                <span>{{ (doc.file_size / 1024)|round|int }} KB</span>
+                                <span class="mx-2">•</span>
+                                <span>{{ doc.upload_date.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ url_for('view_document', doc_id=doc._id) }}"
+                            class="text-primary hover:text-blue-700 transition-colors">
+                            View
+                        </a>
+                        <a href="{{ url_for('download_document', doc_id=doc._id) }}"
+                            class="text-primary hover:text-blue-700 transition-colors">
+                            Download
+                        </a>
+                        <button onclick="deleteDocument('{{ doc._id }}')"
+                            class="text-red-600 hover:text-red-700 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty State -->
+        {% if not documents %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No documents</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Get started by uploading your first document.
+            </p>
+            <div class="mt-6">
+                <a href="{{ url_for('upload') }}"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium
+                           text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2
+                           focus:ring-primary transition-colors">
+                    <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Upload Document
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // View Toggle
+    const gridView = document.getElementById('gridView');
+    const listView = document.getElementById('listView');
+    const documentsGrid = document.getElementById('documentsGrid');
+    const documentsList = document.getElementById('documentsList');
+
+    gridView.addEventListener('click', () => {
+        documentsGrid.classList.remove('hidden');
+        documentsList.classList.add('hidden');
+        gridView.classList.add('text-primary');
+        listView.classList.remove('text-primary');
+    });
+
+    listView.addEventListener('click', () => {
+        documentsGrid.classList.add('hidden');
+        documentsList.classList.remove('hidden');
+        gridView.classList.remove('text-primary');
+        listView.classList.add('text-primary');
+    });
+
+    // Delete Document
+    function deleteDocument(docId) {
+        if (confirm('Are you sure you want to delete this document?')) {
+            fetch(`/delete/${docId}`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting document');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting document');
+                });
+        }
+    }
+
+    // Filters
+    const categoryFilter = document.getElementById('categoryFilter');
+    const sortBy = document.getElementById('sortBy');
+
+    function applyFilters() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('category', categoryFilter.value);
+        params.set('sort', sortBy.value);
+        window.location.search = params.toString();
+    }
+
+    categoryFilter.addEventListener('change', applyFilters);
+    sortBy.addEventListener('change', applyFilters);
+
+    // Set initial filter values from URL params
+    window.addEventListener('load', () => {
+        const params = new URLSearchParams(window.location.search);
+        
+        const category = params.get('category');
+        if (category) {
+            categoryFilter.value = category;
+        }
+        
+        const sort = params.get('sort');
+        if (sort) {
+            sortBy.value = sort;
+        }
+    });
+</script>
+{% endblock %}

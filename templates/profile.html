@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - DigiLocker{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Profile Header -->
+        <div class="mb-8 text-center">
+            <div class="relative inline-block">
+                {% if current_user.profile_picture %}
+                    <img src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_picture) }}"
+                         alt="Profile Picture"
+                         class="h-24 w-24 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg">
+                {% else %}
+                    <div class="h-24 w-24 rounded-full bg-primary text-white flex items-center justify-center text-3xl font-bold border-4 border-white dark:border-gray-800 shadow-lg">
+                        {{ current_user.name[0].upper() }}
+                    </div>
+                {% endif %}
+                <label for="profile_picture" class="absolute bottom-0 right-0 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <svg class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </label>
+                <input type="file" id="profile_picture" name="profile_picture" class="hidden" accept="image/*">
+            </div>
+            <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+                {{ current_user.name }}
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">
+                {{ current_user.email }}
+            </p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Documents -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center glassmorphism">
+                <div class="text-4xl font-bold text-primary mb-2">
+                    {{ stats.total_documents }}
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Total Documents
+                </div>
+            </div>
+
+            <!-- Storage Used -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center glassmorphism">
+                <div class="text-4xl font-bold text-primary mb-2">
+                    {{ stats.storage_used }}
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Storage Used
+                </div>
+            </div>
+
+            <!-- Last Upload -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center glassmorphism">
+                <div class="text-4xl font-bold text-primary mb-2">
+                    {{ stats.last_upload_days }}
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Days Since Last Upload
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Settings -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-6 glassmorphism">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Profile Settings
+            </h2>
+
+            <form action="{{ url_for('update_profile') }}" method="POST" class="space-y-6">
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Full Name
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ current_user.name }}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                               bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Email Address
+                    </label>
+                    <input type="email" id="email" name="email" value="{{ current_user.email }}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                               bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                </div>
+
+                <!-- Change Password -->
+                <div>
+                    <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Current Password
+                    </label>
+                    <input type="password" id="current_password" name="current_password"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                               bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                </div>
+
+                <div>
+                    <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        New Password
+                    </label>
+                    <input type="password" id="new_password" name="new_password"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                               bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                </div>
+
+                <div>
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Confirm New Password
+                    </label>
+                    <input type="password" id="confirm_password" name="confirm_password"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+                               bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white">
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                        Notification Settings
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="email_notifications" class="form-checkbox text-primary"
+                                   {% if current_user.settings.email_notifications %}checked{% endif %}>
+                            <span class="ml-2 text-gray-700 dark:text-gray-300">
+                                Email notifications for document updates
+                            </span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="document_reminders" class="form-checkbox text-primary"
+                                   {% if current_user.settings.document_reminders %}checked{% endif %}>
+                            <span class="ml-2 text-gray-700 dark:text-gray-300">
+                                Document expiry reminders
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex justify-end">
+                    <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium
+                               text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2
+                               focus:ring-primary transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Document Categories -->
+        <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 glassmorphism">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Document Categories
+            </h2>
+            <div class="grid grid-cols-2 gap-4">
+                {% for category, count in stats.categories.items() %}
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <div class="text-lg font-medium text-gray-900 dark:text-white">
+                        {{ category }}
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ count }} documents
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 glassmorphism">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Recent Activity
+            </h2>
+            <div class="space-y-4">
+                {% for activity in recent_activity %}
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        {% if activity.type == 'upload' %}
+                            <svg class="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                            </svg>
+                        {% elif activity.type == 'delete' %}
+                            <svg class="h-6 w-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        {% else %}
+                            <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-900 dark:text-white">
+                            {{ activity.description }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            {{ activity.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Profile Picture Upload
+    const profilePicture = document.getElementById('profile_picture');
+    
+    profilePicture.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+
+        try {
+            const response = await fetch('{{ url_for("update_profile_picture") }}', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error updating profile picture');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error updating profile picture');
+        }
+    });
+
+    // Password Validation
+    const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', (e) => {
+        if (newPassword.value || confirmPassword.value) {
+            if (newPassword.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('New passwords do not match');
+            }
+        }
+    });
+</script>
+{% endblock %}

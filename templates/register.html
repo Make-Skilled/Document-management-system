@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}Register - DigiLocker{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-md w-full space-y-8 animate-slide-up">
+        <!-- Header -->
+        <div class="text-center">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+                Create your account
+            </h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Already have an account?
+                <a href="{{ url_for('login') }}" class="font-medium text-primary hover:text-blue-500 transition-colors">
+                    Sign in
+                </a>
+            </p>
+        </div>
+
+        <!-- Registration Form -->
+        <form class="mt-8 space-y-6" action="{{ url_for('register') }}" method="POST" id="registerForm">
+            <!-- Name -->
+            <div class="relative">
+                <input id="name" name="name" type="text" required
+                    class="peer w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    placeholder=" ">
+                <label for="name"
+                    class="absolute left-2 -top-2.5 bg-white dark:bg-gray-800 px-1 text-sm text-gray-600 dark:text-gray-400 transition-all
+                           peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2
+                           peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-primary">
+                    Full Name
+                </label>
+                <p class="mt-1 text-sm text-red-500 hidden" id="nameError"></p>
+            </div>
+
+            <!-- Email -->
+            <div class="relative">
+                <input id="email" name="email" type="email" required
+                    class="peer w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    placeholder=" ">
+                <label for="email"
+                    class="absolute left-2 -top-2.5 bg-white dark:bg-gray-800 px-1 text-sm text-gray-600 dark:text-gray-400 transition-all
+                           peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2
+                           peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-primary">
+                    Email address
+                </label>
+                <p class="mt-1 text-sm text-red-500 hidden" id="emailError"></p>
+            </div>
+
+            <!-- Aadhar Number -->
+            <div class="relative">
+                <input id="aadhar_number" name="aadhar_number" type="text" required
+                    class="peer w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    placeholder=" " maxlength="12" pattern="\d{12}">
+                <label for="aadhar_number"
+                    class="absolute left-2 -top-2.5 bg-white dark:bg-gray-800 px-1 text-sm text-gray-600 dark:text-gray-400 transition-all
+                           peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2
+                           peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-primary">
+                    Aadhar Number
+                </label>
+                <p class="mt-1 text-sm text-red-500 hidden" id="aadharError"></p>
+            </div>
+
+            <!-- Password -->
+            <div class="relative">
+                <input id="password" name="password" type="password" required
+                    class="peer w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    placeholder=" ">
+                <label for="password"
+                    class="absolute left-2 -top-2.5 bg-white dark:bg-gray-800 px-1 text-sm text-gray-600 dark:text-gray-400 transition-all
+                           peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2
+                           peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-primary">
+                    Password
+                </label>
+                <p class="mt-1 text-sm text-red-500 hidden" id="passwordError"></p>
+                
+                <!-- Password Strength Indicator -->
+                <div class="mt-2">
+                    <div class="h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div id="passwordStrength" class="h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400" id="passwordStrengthText">
+                        Password strength: Too weak
+                    </p>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="relative">
+                <input id="confirm_password" name="confirm_password" type="password" required
+                    class="peer w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-primary bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+                    placeholder=" ">
+                <label for="confirm_password"
+                    class="absolute left-2 -top-2.5 bg-white dark:bg-gray-800 px-1 text-sm text-gray-600 dark:text-gray-400 transition-all
+                           peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2
+                           peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-primary">
+                    Confirm Password
+                </label>
+                <p class="mt-1 text-sm text-red-500 hidden" id="confirmPasswordError"></p>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" id="submitBtn"
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-blue-500 group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                    </span>
+                    Create Account
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const form = document.getElementById('registerForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const aadharInput = document.getElementById('aadhar_number');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Error display elements
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const aadharError = document.getElementById('aadharError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+    const passwordStrength = document.getElementById('passwordStrength');
+    const passwordStrengthText = document.getElementById('passwordStrengthText');
+
+    // Validation functions
+    function validateName() {
+        const name = nameInput.value.trim();
+        if (name.length < 3) {
+            showError(nameError, 'Name must be at least 3 characters long');
+            return false;
+        }
+        hideError(nameError);
+        return true;
+    }
+
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError(emailError, 'Please enter a valid email address');
+            return false;
+        }
+        hideError(emailError);
+        return true;
+    }
+
+    function validateAadhar() {
+        const aadhar = aadharInput.value.trim();
+        const aadharRegex = /^\d{12}$/;
+        if (!aadharRegex.test(aadhar)) {
+            showError(aadharError, 'Aadhar number must be 12 digits');
+            return false;
+        }
+        hideError(aadharError);
+        return true;
+    }
+
+    function validatePassword() {
+        const password = passwordInput.value;
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumbers = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (hasUpperCase && hasLowerCase) strength++;
+        if (hasNumbers) strength++;
+        if (hasSpecialChar) strength++;
+
+        // Update strength indicator
+        const strengthColors = ['bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'];
+        const strengthTexts = ['Too weak', 'Weak', 'Good', 'Strong'];
+        
+        passwordStrength.className = `h-full transition-all duration-300 ${strengthColors[strength - 1]}`;
+        passwordStrength.style.width = `${strength * 25}%`;
+        passwordStrengthText.textContent = `Password strength: ${strengthTexts[strength - 1]}`;
+
+        if (strength < 3) {
+            showError(passwordError, 'Password must be at least 8 characters long and contain uppercase, lowercase, numbers, and special characters');
+            return false;
+        }
+        hideError(passwordError);
+        return true;
+    }
+
+    function validateConfirmPassword() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        if (password !== confirmPassword) {
+            showError(confirmPasswordError, 'Passwords do not match');
+            return false;
+        }
+        hideError(confirmPasswordError);
+        return true;
+    }
+
+    // Helper functions
+    function showError(element, message) {
+        element.textContent = message;
+        element.classList.remove('hidden');
+    }
+
+    function hideError(element) {
+        element.classList.add('hidden');
+    }
+
+    // Event listeners
+    nameInput.addEventListener('input', validateName);
+    emailInput.addEventListener('input', validateEmail);
+    aadharInput.addEventListener('input', validateAadhar);
+    passwordInput.addEventListener('input', validatePassword);
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+
+    // Form submission
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const isNameValid = validateName();
+        const isEmailValid = validateEmail();
+        const isAadharValid = validateAadhar();
+        const isPasswordValid = validatePassword();
+        const isConfirmPasswordValid = validateConfirmPassword();
+
+        if (isNameValid && isEmailValid && isAadharValid && isPasswordValid && isConfirmPasswordValid) {
+            form.submit();
+        }
+    });
+
+    // Format Aadhar number as it's typed
+    aadharInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 12);
+    });
+</script>
+{% endblock %}
