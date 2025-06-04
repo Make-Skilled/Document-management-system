@@ -14,7 +14,7 @@
                          class="h-24 w-24 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg">
                 {% else %}
                     <div class="h-24 w-24 rounded-full bg-primary text-white flex items-center justify-center text-3xl font-bold border-4 border-white dark:border-gray-800 shadow-lg">
-                        {{ current_user.name[0].upper() }}
+                        {{ (current_user.name[0] if current_user.name else '?').upper() }}
                     </div>
                 {% endif %}
                 <label for="profile_picture" class="absolute bottom-0 right-0 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
@@ -233,7 +233,7 @@
         formData.append('profile_picture', file);
 
         try {
-            const response = await fetch('{{ url_for("update_profile_picture") }}', {
+            const response = await fetch('{{ url_for("update_profile") }}', {
                 method: 'POST',
                 body: formData
             });

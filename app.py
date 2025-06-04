@@ -12,6 +12,10 @@ from config import Config
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Profile pictures folder (ensure this is under static for url_for('static', ...))
+PROFILE_PICTURES_FOLDER = os.path.join(app.static_folder, 'profile_pictures')
+os.makedirs(PROFILE_PICTURES_FOLDER, exist_ok=True)
+
 # Initialize MongoDB
 mongo = PyMongo(app)
 
@@ -31,19 +35,26 @@ class User(UserMixin):
     # Add property accessors
     @property
     def name(self):
-        return self.user_data.get('name', '')
+        return self.user_data.get('name') or ''
     
     @property
     def email(self):
         return self.user_data.get('email', '')
-    
+
+    @property
+    def profile_picture(self):
+        return self.user_data.get('profile_picture')
 
     @property
     def settings(self):
-        return self.user_data.get('settings', {
+        # Ensure default settings are provided if not in DB
+        user_settings = self.user_data.get('settings', {}) # Default to empty dict if 'settings' key is missing
+        default_settings = {
             'email_notifications': True,
             'document_reminders': True
-        })
+        }
+        # Merge defaults with user settings; user's explicit settings take precedence.
+        return {**default_settings, **user_settings}
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -255,36 +266,89 @@ def profile():
 @app.route('/update_profile', methods=['POST'])
 @login_required
 def update_profile():
-    updates = {
-        'name': request.form.get('name'),
-        'email': request.form.get('email'),
-        'updated_at': datetime.utcnow()
-    }
+    user_id = ObjectId(current_user.get_id())
+    current_user_data_from_db = mongo.db.users.find_one({'_id': user_id})
+
+    updates = {} 
+    made_changes = False
+
+    new_name = request.form.get('name')
+    if new_name and new_name != current_user_data_from_db.get('name'):
+        updates['name'] = new_name
+        made_changes = True
+
+    new_email = request.form.get('email')
+    if new_email and new_email != current_user_data_from_db.get('email'):
+        if mongo.db.users.find_one({'email': new_email, '_id': {'$ne': user_id}}):
+            flash('Email address is already in use by another account.', 'error')
+            return redirect(url_for('profile'))
+        updates['email'] = new_email
+        made_changes = True
     
-    # Handle password change
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
     
-    if current_password and new_password:
-        user_data = mongo.db.users.find_one({'_id': ObjectId(current_user.get_id())})
-        if check_password_hash(user_data['password_hash'], current_password):
+    if new_password:
+        if not current_password:
+            flash('Please enter your current password to change it.', 'error')
+            return redirect(url_for('profile'))
+        if new_password != confirm_password:
+            flash('New passwords do not match.', 'error')
+            return redirect(url_for('profile'))
+        
+        if check_password_hash(current_user_data_from_db['password_hash'], current_password):
             updates['password_hash'] = generate_password_hash(new_password)
+            made_changes = True
         else:
-            flash('Current password is incorrect', 'error')
+            flash('Current password is incorrect.', 'error')
             return redirect(url_for('profile'))
     
-    # Handle notification settings
-    updates['settings'] = {
+    current_settings = current_user_data_from_db.get('settings', {
+        'email_notifications': True, 'document_reminders': True
+    })
+    new_settings = {
         'email_notifications': 'email_notifications' in request.form,
         'document_reminders': 'document_reminders' in request.form
     }
+    if new_settings != current_settings:
+        updates['settings'] = new_settings
+        made_changes = True
     
-    mongo.db.users.update_one(
-        {'_id': ObjectId(current_user.get_id())},
-        {'$set': updates}
-    )
-    
-    flash('Profile updated successfully!', 'success')
+    if 'profile_picture' in request.files:
+        file = request.files['profile_picture']
+        if file and file.filename != '':
+            if allowed_file(file.filename):
+                filename_base, file_ext = os.path.splitext(file.filename)
+                unique_filename = secure_filename(f"{current_user.get_id()}_{int(datetime.utcnow().timestamp())}{file_ext}")
+                
+                file_path = os.path.join(PROFILE_PICTURES_FOLDER, unique_filename)
+                
+                old_picture_filename = current_user_data_from_db.get('profile_picture')
+                if old_picture_filename:
+                    old_pic_path = os.path.join(PROFILE_PICTURES_FOLDER, old_picture_filename)
+                    if os.path.exists(old_pic_path):
+                        try:
+                            os.remove(old_pic_path)
+                        except Exception as e:
+                            app.logger.error(f"Error deleting old profile picture {old_pic_path}: {e}")
+                
+                file.save(file_path)
+                updates['profile_picture'] = unique_filename
+                made_changes = True
+            else:
+                flash(f"Invalid file type for profile picture. Allowed types: {', '.join(Config.ALLOWED_EXTENSIONS) if hasattr(Config, 'ALLOWED_EXTENSIONS') else 'configured types'}.", 'error')
+
+    if made_changes:
+        updates['updated_at'] = datetime.utcnow()
+        mongo.db.users.update_one(
+            {'_id': user_id},
+            {'$set': updates}
+        )
+        flash('Profile updated successfully!', 'success')
+    elif not ('profile_picture' in request.files and request.files['profile_picture'].filename != ''):
+        flash('No changes were made to your profile.', 'info')
+        
     return redirect(url_for('profile'))
 
 
